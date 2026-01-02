@@ -36,5 +36,8 @@ export function initializeAgents(): void {
   // Import and register agents
   const { registerGeminiAgent } = require('./acp/gemini');
   registerGeminiAgent();
+  
+  const { registerOpenCodeAgent } = require('./acp/opencode');
+  registerOpenCodeAgent();
 }
 

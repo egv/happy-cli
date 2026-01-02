@@ -238,6 +238,24 @@ import { execFileSync } from 'node:child_process'
       process.exit(1)
     }
     return;
+  } else if (subcommand === 'opencode') {
+    // Handle opencode command (ACP-based agent)
+    try {
+      const { runOpenCode } = await import('@/opencode/runOpenCode');
+      
+      const {
+        credentials
+      } = await authAndSetupMachineIfNeeded();
+
+      await runOpenCode({credentials});
+    } catch (error) {
+      console.error(chalk.red('Error:'), error instanceof Error ? error.message : 'Unknown error')
+      if (process.env.DEBUG) {
+        console.error(error)
+      }
+      process.exit(1)
+    }
+    return;
   } else if (subcommand === 'logout') {
     // Keep for backward compatibility - redirect to auth logout
     console.log(chalk.yellow('Note: "happy logout" is deprecated. Use "happy auth logout" instead.\n'));
@@ -444,6 +462,7 @@ ${chalk.bold('Usage:')}
   happy auth              Manage authentication
   happy codex             Start Codex mode
   happy gemini            Start Gemini mode (ACP)
+  happy opencode           Start OpenCode mode (ACP)
   happy connect           Connect AI vendor API keys
   happy notify            Send push notification
   happy daemon            Manage background service that allows
