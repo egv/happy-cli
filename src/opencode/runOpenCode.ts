@@ -34,6 +34,7 @@ import type { AgentBackend, AgentMessage } from '@/agent/AgentBackend';
 export async function runOpenCode(opts: {
   credentials: Credentials;
   startedBy?: 'daemon' | 'terminal';
+  cwd?: string;
 }): Promise<void> {
   const sessionTag = randomUUID();
   const api = await ApiClient.create(opts.credentials);
@@ -56,7 +57,7 @@ export async function runOpenCode(opts: {
     controlledByUser: false,
   };
   const metadata: Metadata = {
-    path: process.cwd(),
+    path: opts.cwd || process.cwd(),
     host: os.hostname(),
     version: packageJson.version,
     os: os.platform(),
@@ -164,7 +165,7 @@ export async function runOpenCode(opts: {
 
   // Create OpenCode backend
   openCodeBackend = createOpenCodeBackend({
-    cwd: process.cwd(),
+    cwd: opts.cwd || process.cwd(),
     mcpServers,
   });
 

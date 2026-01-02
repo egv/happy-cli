@@ -4,8 +4,11 @@
  * This module provides a factory function for creating an OpenCode backend
  * that communicates using the Agent Client Protocol (ACP).
  * 
- * OpenCode is available via npm install -g @anthropic-ai/opencode
- * and supports the --acp flag for ACP mode.
+ * OpenCode is available via:
+ * - npm install -g opencode-ai
+ * - brew install opencode
+ * 
+ * OpenCode ACP mode is started via 'opencode acp' command.
  */
 
 import { AcpSdkBackend, type AcpSdkBackendOptions } from './AcpSdkBackend';
@@ -17,10 +20,10 @@ import { agentRegistry, type AgentFactoryOptions } from '../AgentRegistry';
  * Options for creating an OpenCode ACP backend
  */
 export interface OpenCodeBackendOptions extends AgentFactoryOptions {
-  /** Command to spawn the OpenCode agent */
+  /** Command to spawn OpenCode agent */
   command?: string;
   
-  /** Arguments for the agent command */
+  /** Arguments for agent agent command */
   args?: string[];
   
   /** MCP servers to make available to the agent */
@@ -31,7 +34,7 @@ export interface OpenCodeBackendOptions extends AgentFactoryOptions {
  * Create an OpenCode backend using ACP (official SDK).
  * 
  * The OpenCode CLI must be installed and available in PATH.
- * Uses the --acp flag to enable ACP mode.
+ * Uses 'acp' subcommand for ACP mode.
  * 
  * @param options - Configuration options
  * @returns AgentBackend instance for OpenCode
@@ -41,7 +44,7 @@ export function createOpenCodeBackend(options: OpenCodeBackendOptions): AgentBac
     agentName: 'opencode',
     cwd: options.cwd,
     command: options.command || 'opencode',
-    args: options.args || ['--acp'],
+    args: options.args || ['acp'],
     env: options.env,
     mcpServers: options.mcpServers,
   };

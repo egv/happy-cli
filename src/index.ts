@@ -243,11 +243,19 @@ import { execFileSync } from 'node:child_process'
     try {
       const { runOpenCode } = await import('@/opencode/runOpenCode');
       
+      // Parse --pwd argument (working directory)
+      let workingDir: string | undefined = undefined;
+      for (let i = 1; i < args.length; i++) {
+        if (args[i] === '--pwd' && args[i + 1]) {
+          workingDir = args[++i];
+        }
+      }
+      
       const {
         credentials
       } = await authAndSetupMachineIfNeeded();
 
-      await runOpenCode({credentials});
+      await runOpenCode({credentials, cwd: workingDir || process.cwd()});
     } catch (error) {
       console.error(chalk.red('Error:'), error instanceof Error ? error.message : 'Unknown error')
       if (process.env.DEBUG) {
@@ -463,6 +471,8 @@ ${chalk.bold('Usage:')}
   happy codex             Start Codex mode
   happy gemini            Start Gemini mode (ACP)
   happy opencode           Start OpenCode mode (ACP)
+    Options:
+      --pwd <dir>          Working directory (default: current directory)
   happy connect           Connect AI vendor API keys
   happy notify            Send push notification
   happy daemon            Manage background service that allows
