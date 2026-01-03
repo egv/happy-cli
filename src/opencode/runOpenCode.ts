@@ -245,7 +245,7 @@ export async function runOpenCode(opts: {
     }
   });
 
-  // Simple message display function - displays all messages
+  // Simple message display function - shows current assistant stream inline
   const displayMessages = () => {
     if (!hasTTY) return;
     const messages = messageBuffer.getMessages();
@@ -254,25 +254,43 @@ export async function runOpenCode(opts: {
     console.log('');
     console.log('─'.repeat(60));
     
+    let currentAssistantContent = '';
+    
     for (const msg of messages) {
       const role = msg.type === 'user' ? '👤 User' : 
-                    msg.type === 'assistant' ? '🤖 Assistant' :
+                    msg.type === 'assistant' ? '🤖' :
                     msg.type === 'status' ? '📋 Status' :
                     msg.type === 'tool' ? '🔧 Tool' :
                     msg.type === 'result' ? '✅ Result' : '📨 Message';
       
       const timestamp = msg.timestamp.toLocaleTimeString();
-      console.log(`[${timestamp}] ${role}`);
       
-      const content = msg.content;
-      if (content.length > 2000) {
-        console.log(content.substring(0, 2000) + '...');
-        console.log('(truncated)');
+      if (msg.type === 'assistant') {
+        // For assistant messages, accumulate content for streaming
+        currentAssistantContent += msg.content;
+        // Clear previous line and reprint with accumulated content
+        process.stdout.write(`\r[${timestamp}] 🤖 ${currentAssistantContent}`);
       } else {
-        console.log(content);
+        // For non-assistant messages, show normally
+        if (currentAssistantContent) {
+          console.log(`[${timestamp}] ${role}`);
+          console.log(currentAssistantContent);
+          console.log('');
+          currentAssistantContent = '';
+        }
+        
+        console.log(`[${timestamp}] ${role}`);
+        
+        const content = msg.content;
+        if (content.length > 2000) {
+          console.log(content.substring(0, 2000) + '...');
+          console.log('(truncated)');
+        } else {
+          console.log(content);
+        }
+        console.log('');
       }
-      console.log('');
-     }
+    }
   };
   
   // Display messages on buffer changes
