@@ -234,6 +234,39 @@ export async function runOpenCode(opts: {
     }
   });
 
+  // Simple message display function
+  const displayMessages = () => {
+    if (!hasTTY) return;
+    const messages = messageBuffer.getMessages();
+    if (messages.length === 0) return;
+    
+    console.log('');
+    console.log('─'.repeat(60));
+    
+    for (const msg of messages) {
+      const role = msg.type === 'user' ? '👤 User' : 
+                    msg.type === 'assistant' ? '🤖 Assistant' :
+                    msg.type === 'status' ? '📋 Status' :
+                    msg.type === 'tool' ? '🔧 Tool' :
+                    msg.type === 'result' ? '✅ Result' : '📨 Message';
+      
+      const timestamp = msg.timestamp.toLocaleTimeString();
+      console.log(`[${timestamp}] ${role}`);
+      
+      const content = msg.content;
+      if (content.length > 2000) {
+        console.log(content.substring(0, 2000) + '...');
+        console.log('(truncated)');
+      } else {
+        console.log(content);
+      }
+      console.log('');
+    }
+  };
+  
+  // Display messages on buffer changes
+  messageBuffer.onUpdate(displayMessages);
+  
   // Handle user messages from mobile
   session.onUserMessage(async (message) => {
     if (!acpSessionId) {
