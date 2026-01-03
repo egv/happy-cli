@@ -630,6 +630,8 @@ export class AcpSdkBackend implements AgentBackend {
         cwd: this.options.cwd,
         mcpServers: mcpServers as unknown as NewSessionRequest['mcpServers'],
       };
+      
+      logger.debug(`[AcpSdkBackend] Creating new session with:`, JSON.stringify(newSessionRequest, null, 2));
 
       logger.debug(`[AcpSdkBackend] Creating new session...`);
       let newSessionTimeout: NodeJS.Timeout | null = null;
@@ -1167,18 +1169,20 @@ export class AcpSdkBackend implements AgentBackend {
     try {
       logger.debug(`[AcpSdkBackend] Sending prompt (length: ${prompt.length}): ${prompt.substring(0, 100)}...`);
       logger.debug(`[AcpSdkBackend] Full prompt: ${prompt}`);
+      logger.debug(`[AcpSdkBackend] Using sessionId: ${this.acpSessionId}`);
       
       const contentBlock: ContentBlock = {
         type: 'text',
         text: prompt,
       };
-
+      
       const promptRequest: PromptRequest = {
         sessionId: this.acpSessionId,
         prompt: [contentBlock],
       };
-
+      
       logger.debug(`[AcpSdkBackend] Prompt request:`, JSON.stringify(promptRequest, null, 2));
+      logger.debug(`[AcpSdkBackend] Connection state - hasConnection: ${!!this.connection}, acpSessionId: ${this.acpSessionId}`);
       await this.connection.prompt(promptRequest);
       logger.debug('[AcpSdkBackend] Prompt request sent to ACP connection');
       
