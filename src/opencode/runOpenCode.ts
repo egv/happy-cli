@@ -245,22 +245,16 @@ export async function runOpenCode(opts: {
     }
   });
 
-  // Simple message display function
-  let lastDisplayedCount = 0;
+  // Simple message display function - displays all messages
   const displayMessages = () => {
     if (!hasTTY) return;
     const messages = messageBuffer.getMessages();
-    
-    // Only display new messages (not re-display everything)
-    if (messages.length <= lastDisplayedCount) return;
-    
-    const newMessages = messages.slice(lastDisplayedCount);
-    if (newMessages.length === 0) return;
+    if (messages.length === 0) return;
     
     console.log('');
     console.log('─'.repeat(60));
     
-    for (const msg of newMessages) {
+    for (const msg of messages) {
       const role = msg.type === 'user' ? '👤 User' : 
                     msg.type === 'assistant' ? '🤖 Assistant' :
                     msg.type === 'status' ? '📋 Status' :
@@ -278,9 +272,7 @@ export async function runOpenCode(opts: {
         console.log(content);
       }
       console.log('');
-    }
-    
-    lastDisplayedCount = messages.length;
+     }
   };
   
   // Display messages on buffer changes
