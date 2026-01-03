@@ -125,6 +125,10 @@ export async function runOpenCode(opts: {
         }));
         session.sendSessionDeath();
         await session.flush();
+        
+        // Small delay to ensure Socket.IO sends all messages before closing
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         await session.close();
       }
 
